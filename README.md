@@ -1,0 +1,1 @@
+# Previsão do Sexo e Peso de Galinhas D'Angola a partir das medidas corporais: Aplicações no manejo avícula
