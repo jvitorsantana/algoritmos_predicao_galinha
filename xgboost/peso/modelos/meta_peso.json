@@ -1,0 +1,23 @@
+{
+  "features": [
+    "IDADE",
+    "PESCOCO",
+    "ASA",
+    "CIRCFABDOM",
+    "SOBRECOXA",
+    "COXA",
+    "CANELA"
+  ],
+  "params": {
+    "colsample_bytree": 0.9661017366676425,
+    "gamma": 0.28761072222235384,
+    "learning_rate": 0.02678053034973514,
+    "max_depth": 3,
+    "min_child_weight": 8,
+    "n_estimators": 205,
+    "reg_alpha": 0.1678300323984816,
+    "reg_lambda": 0.7545198558433484,
+    "subsample": 0.8587393446674896
+  },
+  "cv_score": 0.9408737604373416
+}
