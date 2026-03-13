@@ -90,7 +90,7 @@ MODELS = {
             'model__reg_alpha': uniform(0, 1.0),
             'model__reg_lambda': uniform(0.5, 2.0),
         },
-        'n_iter': 200,
+        'n_iter': 50,
     },
     'LightGBM': {
         'pipeline': Pipeline([('model', LGBMRegressor(random_state=42, n_jobs=-1, verbose=-1))]),
@@ -104,7 +104,7 @@ MODELS = {
             'model__reg_alpha': uniform(0, 1.0),
             'model__reg_lambda': uniform(0.5, 2.0),
         },
-        'n_iter': 200,
+        'n_iter': 50,
     },
     'Random Forest': {
         'pipeline': Pipeline([('model', RandomForestRegressor(random_state=42, n_jobs=-1))]),
@@ -115,7 +115,7 @@ MODELS = {
             'model__min_samples_leaf': randint(1, 10),
             'model__max_features': uniform(0.3, 0.7),
         },
-        'n_iter': 100,
+        'n_iter': 30,
     },
     'Extra Trees': {
         'pipeline': Pipeline([('model', ExtraTreesRegressor(random_state=42, n_jobs=-1))]),
@@ -126,7 +126,7 @@ MODELS = {
             'model__min_samples_leaf': randint(1, 10),
             'model__max_features': uniform(0.3, 0.7),
         },
-        'n_iter': 100,
+        'n_iter': 30,
     },
     'Gradient Boosting': {
         'pipeline': Pipeline([('model', GradientBoostingRegressor(random_state=42))]),
@@ -138,7 +138,7 @@ MODELS = {
             'model__min_samples_split': randint(2, 15),
             'model__min_samples_leaf': randint(1, 10),
         },
-        'n_iter': 100,
+        'n_iter': 30,
     },
     'SVR': {
         'pipeline': Pipeline([
@@ -151,7 +151,7 @@ MODELS = {
             'model__kernel': ['rbf', 'poly'],
             'model__gamma': ['scale', 'auto'],
         },
-        'n_iter': 60,
+        'n_iter': 20,
     },
     'KNN': {
         'pipeline': Pipeline([
@@ -163,7 +163,7 @@ MODELS = {
             'model__weights': ['uniform', 'distance'],
             'model__metric': ['euclidean', 'manhattan'],
         },
-        'n_iter': 40,
+        'n_iter': 15,
     },
     'Ridge': {
         'pipeline': Pipeline([
@@ -173,7 +173,7 @@ MODELS = {
         'params': {
             'model__alpha': uniform(0.01, 100),
         },
-        'n_iter': 30,
+        'n_iter': 15,
     },
     'Lasso': {
         'pipeline': Pipeline([
@@ -183,7 +183,7 @@ MODELS = {
         'params': {
             'model__alpha': uniform(0.01, 50),
         },
-        'n_iter': 30,
+        'n_iter': 15,
     },
     'ElasticNet': {
         'pipeline': Pipeline([
@@ -194,7 +194,7 @@ MODELS = {
             'model__alpha': uniform(0.01, 50),
             'model__l1_ratio': uniform(0.1, 0.9),
         },
-        'n_iter': 30,
+        'n_iter': 15,
     },
 }
 

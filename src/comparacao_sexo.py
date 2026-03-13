@@ -109,7 +109,7 @@ MODELS = {
             'model__reg_alpha': uniform(0, 1.0),
             'model__reg_lambda': uniform(0.5, 2.0),
         },
-        'n_iter': 200,
+        'n_iter': 50,
     },
     'LightGBM': {
         'pipeline': Pipeline([('model', LGBMClassifier(
@@ -126,7 +126,7 @@ MODELS = {
             'model__reg_alpha': uniform(0, 1.0),
             'model__reg_lambda': uniform(0.5, 2.0),
         },
-        'n_iter': 200,
+        'n_iter': 50,
     },
     'Random Forest': {
         'pipeline': Pipeline([('model', RandomForestClassifier(
@@ -139,7 +139,7 @@ MODELS = {
             'model__min_samples_leaf': randint(1, 15),
             'model__max_features': uniform(0.3, 0.7),
         },
-        'n_iter': 100,
+        'n_iter': 30,
     },
     'Extra Trees': {
         'pipeline': Pipeline([('model', ExtraTreesClassifier(
@@ -152,7 +152,7 @@ MODELS = {
             'model__min_samples_leaf': randint(1, 15),
             'model__max_features': uniform(0.3, 0.7),
         },
-        'n_iter': 100,
+        'n_iter': 30,
     },
     'Gradient Boosting': {
         'pipeline': Pipeline([('model', GradientBoostingClassifier(random_state=42))]),
@@ -164,7 +164,7 @@ MODELS = {
             'model__min_samples_split': randint(2, 15),
             'model__min_samples_leaf': randint(1, 10),
         },
-        'n_iter': 100,
+        'n_iter': 30,
     },
     'SVM': {
         'pipeline': Pipeline([
@@ -176,7 +176,7 @@ MODELS = {
             'model__kernel': ['rbf', 'poly', 'linear'],
             'model__gamma': ['scale', 'auto'],
         },
-        'n_iter': 60,
+        'n_iter': 20,
     },
     'KNN': {
         'pipeline': Pipeline([
@@ -188,7 +188,7 @@ MODELS = {
             'model__weights': ['uniform', 'distance'],
             'model__metric': ['euclidean', 'manhattan'],
         },
-        'n_iter': 40,
+        'n_iter': 15,
     },
     'Logistic Regression': {
         'pipeline': Pipeline([
@@ -200,7 +200,7 @@ MODELS = {
             'model__penalty': ['l1', 'l2'],
             'model__solver': ['saga'],
         },
-        'n_iter': 30,
+        'n_iter': 15,
     },
 }
 
