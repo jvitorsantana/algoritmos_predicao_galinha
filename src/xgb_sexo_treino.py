@@ -4,13 +4,19 @@ warnings.filterwarnings('ignore')
 import os
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from matplotlib import pyplot as plt
-from sklearn.model_selection import RandomizedSearchCV, KFold
+from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
 from xgboost import XGBClassifier
 from sklearn.preprocessing import LabelEncoder
 from scipy.stats import randint, uniform
 import pickle
+
+ROOT = Path(__file__).resolve().parent.parent
+
+MODEL_DIR = ROOT / 'results' / 'models' / 'xgb_sexo'
+FIGURES_DIR = ROOT / 'results' / 'figures'
 
 plt.rcParams['figure.figsize'] = [16, 10]
 
@@ -23,10 +29,11 @@ print("Usando medidas biometricas para classificar o sexo da ave")
 print("="*80)
 
 # Pasta para salvar resultados
-os.makedirs('resultados_treino', exist_ok=True)
+MODEL_DIR.mkdir(parents=True, exist_ok=True)
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 # Carregar dataset de TREINO
-dados = pd.read_csv('treino.csv', sep=';', encoding='utf-8')
+dados = pd.read_csv(ROOT / 'data' / 'processed' / 'sexo_treino.csv', sep=';', encoding='utf-8')
 
 print(f"\nTotal de registros (treino): {len(dados)}")
 print(f"Animais unicos: {dados['ANIMAL'].nunique()}")
@@ -39,8 +46,8 @@ print("PREPARACAO DOS DADOS")
 print("="*80)
 
 # Garantir que colunas numericas estao no tipo correto
-colunas_numericas = ['PESO', 'IDADE', 'CIRCFABDOM', 'DORSO', 'CANELA', 'ASA', 'COXA',
-                     'BICO', 'CIRCFCABECA', 'PESCOCO', 'SOBRECOXA']
+colunas_numericas = ['PESO', 'IDADE', 'BICO', 'CIRCFCABECA', 'PESCOCO', 'ASA', 'TULIPA',
+                     'DORSO', 'VENTRE', 'CIRCFABDOM', 'SOBRECOXA', 'COXA', 'CANELA', 'UNHAMAIOR']
 for col in colunas_numericas:
     if col in dados.columns:
         dados[col] = pd.to_numeric(dados[col], errors='coerce')
@@ -60,8 +67,8 @@ print(dados['SEXO'].value_counts())
 # =============================================================================
 # FEATURES
 # =============================================================================
-colunas_features = ['PESO', 'IDADE', 'CIRCFABDOM', 'DORSO', 'CANELA', 'ASA', 'COXA',
-                    'BICO', 'CIRCFCABECA', 'PESCOCO', 'SOBRECOXA']
+colunas_features = ['PESO', 'IDADE', 'BICO', 'CIRCFCABECA', 'PESCOCO', 'ASA', 'TULIPA',
+                    'DORSO', 'VENTRE', 'CIRCFABDOM', 'SOBRECOXA', 'COXA', 'CANELA', 'UNHAMAIOR']
 
 colunas_disponiveis = [col for col in colunas_features if col in dados.columns]
 print(f"\nFeatures utilizadas: {colunas_disponiveis}")
@@ -90,22 +97,22 @@ print(f"\nDesbalanceamento detectado: scale_pos_weight = {scale_pos_weight:.4f}"
 # =============================================================================
 # CONFIGURACAO DO MODELO
 # =============================================================================
-N_ROUNDS = 10
-N_ITER_PER_ROUND = 10
+N_ROUNDS = 15
+N_ITER_PER_ROUND = 20
 
 param_distributions = {
-    'n_estimators': randint(30, 100),
-    'max_depth': randint(2, 5),
-    'learning_rate': uniform(0.01, 0.1),
-    'subsample': uniform(0.6, 0.3),
-    'colsample_bytree': uniform(0.6, 0.3),
-    'gamma': uniform(0.5, 2.0),
-    'min_child_weight': randint(5, 15),
-    'reg_alpha': uniform(0.5, 2.0),
-    'reg_lambda': uniform(1.0, 3.0)
+    'n_estimators': randint(50, 500),
+    'max_depth': randint(2, 7),
+    'learning_rate': uniform(0.005, 0.15),
+    'subsample': uniform(0.6, 0.4),
+    'colsample_bytree': uniform(0.5, 0.5),
+    'gamma': uniform(0, 0.5),
+    'min_child_weight': randint(1, 15),
+    'reg_alpha': uniform(0, 1.0),
+    'reg_lambda': uniform(0.5, 2.0)
 }
 
-cv = KFold(n_splits=5, shuffle=True, random_state=42)
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 # =============================================================================
 # TREINAMENTO
@@ -283,27 +290,27 @@ plt.legend()
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('resultados_treino/grafico_treino.png', dpi=150, bbox_inches='tight')
+plt.savefig(FIGURES_DIR / 'grafico_treino.png', dpi=150, bbox_inches='tight')
 plt.show()
-print("\nGrafico salvo em: resultados_treino/grafico_treino.png")
+print(f"\nGrafico salvo em: {FIGURES_DIR / 'grafico_treino.png'}")
 
 # =============================================================================
 # SALVAR MODELO E ENCODER
 # =============================================================================
-with open('resultados_treino/modelo_xgb.pkl', 'wb') as f:
+with open(MODEL_DIR / 'modelo_xgb.pkl', 'wb') as f:
     pickle.dump(best_xgb, f)
 
-with open('resultados_treino/label_encoder.pkl', 'wb') as f:
+with open(MODEL_DIR / 'label_encoder.pkl', 'wb') as f:
     pickle.dump(label_encoder, f)
 
-with open('resultados_treino/features.pkl', 'wb') as f:
+with open(MODEL_DIR / 'features.pkl', 'wb') as f:
     pickle.dump(colunas_disponiveis, f)
 
 print(f"\n{'='*80}")
 print("TREINAMENTO CONCLUIDO!")
-print("Arquivos salvos em: resultados_treino/")
+print(f"Arquivos salvos em: {MODEL_DIR}")
 print("  - modelo_xgb.pkl       (modelo treinado)")
 print("  - label_encoder.pkl    (encoder das classes)")
 print("  - features.pkl         (lista de features usadas)")
-print("  - grafico_treino.png   (graficos de treino)")
+print(f"Grafico salvo em: {FIGURES_DIR / 'grafico_treino.png'}")
 print(f"{'='*80}")
