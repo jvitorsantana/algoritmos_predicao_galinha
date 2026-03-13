@@ -4,9 +4,17 @@ warnings.filterwarnings('ignore')
 import os
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from matplotlib import pyplot as plt
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import joblib
+
+ROOT = Path(__file__).resolve().parent.parent
+
+DATA_DIR = ROOT / 'data' / 'processed'
+MODEL_DIR = ROOT / 'results' / 'models' / 'xgb_peso'
+PRED_DIR = ROOT / 'results' / 'predictions' / 'xgb_peso'
+FIGURES_DIR = ROOT / 'results' / 'figures'
 
 plt.rcParams['figure.figsize'] = [16, 10]
 
@@ -17,7 +25,8 @@ print("="*80)
 
 IDADES = [0, 7, 14, 21, 28, 52, 66, 80, 101, 115]
 
-os.makedirs('predicoes', exist_ok=True)
+PRED_DIR.mkdir(parents=True, exist_ok=True)
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 todos_resultados = []
 resumo = []
@@ -25,14 +34,14 @@ dados_plot = []
 feature_importances_por_idade = []
 
 for idade in IDADES:
-    arquivo = f'datasets/dataset_idade_{idade}.csv'
-    modelo_path = f'modelos/modelo_idade_{idade}.joblib'
+    arquivo = DATA_DIR / f'dataset_idade_{idade}.csv'
+    modelo_path = MODEL_DIR / f'modelo_idade_{idade}.joblib'
 
-    if not os.path.exists(arquivo):
+    if not arquivo.exists():
         print(f"\nArquivo {arquivo} nao encontrado, pulando...")
         continue
 
-    if not os.path.exists(modelo_path):
+    if not modelo_path.exists():
         print(f"\nModelo {modelo_path} nao encontrado, pulando...")
         print("Execute xgb_treino.py primeiro para gerar os modelos.")
         continue
@@ -142,7 +151,7 @@ for idade in IDADES:
                 'y_pred': resultado_idade.loc[mask_valido, 'PESO_PREDITO'].values
             })
 
-    csv_path = f'predicoes/predicoes_idade_{idade}.csv'
+    csv_path = PRED_DIR / f'predicoes_idade_{idade}.csv'
     resultado_idade[['ANIMAL', 'IDADE', 'PESO_PREDITO']].to_csv(
         csv_path, sep=';', index=False, encoding='utf-8'
     )
@@ -155,7 +164,7 @@ if todos_resultados:
 
     colunas_csv = ['ANIMAL', 'IDADE', 'PESO_PREDITO']
     resultado_final[colunas_csv].to_csv(
-        'predicoes/predicoes_todas_idades.csv', sep=';', index=False, encoding='utf-8'
+        PRED_DIR / 'predicoes_todas_idades.csv', sep=';', index=False, encoding='utf-8'
     )
 
     print(f"\n{'='*80}")
@@ -173,12 +182,12 @@ if todos_resultados:
         else:
             print(f"{r['idade']:6d} | {r['n_animais']:6d} |      N/A |      N/A |      N/A")
 
-    print(f"\nArquivos gerados na pasta 'predicoes/':")
+    print(f"\nArquivos gerados na pasta '{PRED_DIR}':")
     for idade in IDADES:
-        csv_path = f'predicoes/predicoes_idade_{idade}.csv'
-        if os.path.exists(csv_path):
+        csv_path = PRED_DIR / f'predicoes_idade_{idade}.csv'
+        if csv_path.exists():
             print(f"  - {csv_path}")
-    print(f"  - predicoes/predicoes_todas_idades.csv (consolidado)")
+    print(f"  - {PRED_DIR / 'predicoes_todas_idades.csv'} (consolidado)")
 
 if dados_plot and resumo:
     all_y_real = np.concatenate([d['y_real'] for d in dados_plot])
@@ -234,9 +243,9 @@ if dados_plot and resumo:
     plt.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig('resultado_xgb_teste_geral.png', dpi=150, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'resultado_xgb_teste_geral.png', dpi=150, bbox_inches='tight')
     plt.show()
-    print(f"\nGrafico geral salvo em: resultado_xgb_teste_geral.png")
+    print(f"\nGrafico geral salvo em: {FIGURES_DIR / 'resultado_xgb_teste_geral.png'}")
 
     n_idades = len(feature_importances_por_idade)
     n_cols = min(3, n_idades)
@@ -271,9 +280,9 @@ if dados_plot and resumo:
         axes[row, col].set_visible(False)
 
     plt.tight_layout()
-    plt.savefig('resultado_xgb_teste_features.png', dpi=150, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'resultado_xgb_teste_features.png', dpi=150, bbox_inches='tight')
     plt.show()
-    print(f"Grafico de features salvo em: resultado_xgb_teste_features.png")
+    print(f"Grafico de features salvo em: {FIGURES_DIR / 'resultado_xgb_teste_features.png'}")
 
 print(f"\n{'='*80}")
 print("TESTE CONCLUIDO!")

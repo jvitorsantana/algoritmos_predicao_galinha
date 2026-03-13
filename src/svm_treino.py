@@ -4,6 +4,7 @@ warnings.filterwarnings('ignore')
 import os
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
@@ -13,36 +14,41 @@ from sklearn.metrics import (accuracy_score, precision_score, recall_score,
 from scipy.stats import loguniform
 import joblib
 
+ROOT = Path(__file__).resolve().parent.parent
+
+SVM_DATA_DIR = ROOT / 'data' / 'svm'
+SVM_MODEL_DIR = ROOT / 'results' / 'models' / 'svm'
 
 IDADES = sorted([
     int(f.replace('dataset_idade_', '').replace('.csv', ''))
-    for f in os.listdir('.')
+    for f in os.listdir(SVM_DATA_DIR)
     if f.startswith('dataset_idade_') and f.endswith('.csv')
     and f.replace('dataset_idade_', '').replace('.csv', '').isdigit()
     and 0 <= int(f.replace('dataset_idade_', '').replace('.csv', '')) <= 115
 ])
 print(f"Datasets encontrados: {IDADES}")
 
-FEATURES = ['PESO', 'CIRCFABDOM', 'DORSO', 'CANELA', 'ASA', 'COXA']
+FEATURES = ['PESO', 'BICO', 'CIRCFCABECA', 'PESCOCO', 'ASA', 'TULIPA',
+            'DORSO', 'VENTRE', 'CIRCFABDOM', 'SOBRECOXA', 'COXA', 'CANELA', 'UNHAMAIOR']
 
-os.makedirs('modelos_svm', exist_ok=True)
+SVM_MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
-N_ROUNDS = 20
-N_ITER_PER_ROUND = 5
+N_ROUNDS = 15
+N_ITER_PER_ROUND = 15
 
 param_distributions = {
-    'svm__C': loguniform(1e-2, 1e2),
-    'svm__kernel': ['linear', 'rbf', 'poly'],
-    'svm__gamma': loguniform(1e-4, 1e1),
-    'svm__degree': [2, 3, 4]
+    'svm__C': loguniform(1e-3, 1e3),
+    'svm__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
+    'svm__gamma': loguniform(1e-5, 1e1),
+    'svm__degree': [2, 3, 4, 5]
 }
 
 resultados = []
 
 for idade in IDADES:
-    arquivo = f'dataset_idade_{idade}.csv'
+    arquivo = SVM_DATA_DIR / f'dataset_idade_{idade}.csv'
 
-    if not os.path.exists(arquivo):
+    if not arquivo.exists():
         print(f"\nArquivo {arquivo} nao encontrado, pulando...")
         continue
 
@@ -146,7 +152,7 @@ for idade in IDADES:
     print(classification_report(y, y_pred, target_names=['Femea', 'Macho'],
                                  zero_division=0))
 
-    modelo_path = f'modelos_svm/modelo_svm_idade_{idade}.joblib'
+    modelo_path = SVM_MODEL_DIR / f'modelo_svm_idade_{idade}.joblib'
     joblib.dump({
         'model': best_pipeline,
         'features': features_disponiveis,

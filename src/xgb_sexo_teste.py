@@ -4,9 +4,16 @@ warnings.filterwarnings('ignore')
 import os
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
 import pickle
+
+ROOT = Path(__file__).resolve().parent.parent
+
+MODEL_DIR = ROOT / 'results' / 'models' / 'xgb_sexo'
+PRED_DIR = ROOT / 'results' / 'predictions' / 'xgb_sexo'
+FIGURES_DIR = ROOT / 'results' / 'figures'
 
 plt.rcParams['figure.figsize'] = [16, 10]
 
@@ -19,7 +26,8 @@ print("Avaliando o modelo treinado no conjunto de teste")
 print("="*80)
 
 # Pasta para salvar resultados
-os.makedirs('resultados_teste', exist_ok=True)
+PRED_DIR.mkdir(parents=True, exist_ok=True)
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 # =============================================================================
 # CARREGAR MODELO E ARTEFATOS SALVOS
@@ -27,13 +35,13 @@ os.makedirs('resultados_teste', exist_ok=True)
 print("\nCarregando modelo e artefatos do treino...")
 
 try:
-    with open('resultados_treino/modelo_xgb.pkl', 'rb') as f:
+    with open(MODEL_DIR / 'modelo_xgb.pkl', 'rb') as f:
         best_xgb = pickle.load(f)
 
-    with open('resultados_treino/label_encoder.pkl', 'rb') as f:
+    with open(MODEL_DIR / 'label_encoder.pkl', 'rb') as f:
         label_encoder = pickle.load(f)
 
-    with open('resultados_treino/features.pkl', 'rb') as f:
+    with open(MODEL_DIR / 'features.pkl', 'rb') as f:
         colunas_disponiveis = pickle.load(f)
 
     print("Modelo carregado com sucesso!")
@@ -47,7 +55,7 @@ except FileNotFoundError as e:
 # =============================================================================
 # CARREGAR DATASET DE TESTE
 # =============================================================================
-dados_teste = pd.read_csv('teste.csv', sep=';', encoding='utf-8')
+dados_teste = pd.read_csv(ROOT / 'data' / 'processed' / 'sexo_teste.csv', sep=';', encoding='utf-8')
 
 print(f"\nTotal de registros (teste): {len(dados_teste)}")
 print(f"Animais unicos no teste: {dados_teste['ANIMAL'].nunique()}")
@@ -194,9 +202,9 @@ plt.legend()
 plt.grid(True, alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('resultados_teste/grafico_teste.png', dpi=150, bbox_inches='tight')
+plt.savefig(FIGURES_DIR / 'grafico_teste.png', dpi=150, bbox_inches='tight')
 plt.show()
-print("\nGrafico salvo em: resultados_teste/grafico_teste.png")
+print(f"\nGrafico salvo em: {FIGURES_DIR / 'grafico_teste.png'}")
 
 # =============================================================================
 # SALVAR PREDICOES
@@ -205,11 +213,11 @@ resultado = dados_clean[['ANIMAL', 'SEXO', 'IDADE']].copy()
 resultado['SEXO_PRED'] = label_encoder.inverse_transform(y_test_pred)
 resultado['PROBABILIDADE'] = y_test_proba
 resultado['ACERTO'] = (y_test == y_test_pred)
-resultado.to_csv('resultados_teste/predicoes_teste.csv', sep=';', index=False)
+resultado.to_csv(PRED_DIR / 'predicoes_teste.csv', sep=';', index=False)
 
 print(f"\n{'='*80}")
 print("TESTE CONCLUIDO!")
-print("Arquivos salvos em: resultados_teste/")
-print("  - grafico_teste.png       (graficos de avaliacao)")
+print(f"Predicoes salvas em: {PRED_DIR}")
 print("  - predicoes_teste.csv     (predicoes detalhadas por animal e idade)")
+print(f"Grafico salvo em: {FIGURES_DIR / 'grafico_teste.png'}")
 print(f"{'='*80}")

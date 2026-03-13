@@ -4,11 +4,19 @@ warnings.filterwarnings('ignore')
 import os
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from matplotlib import pyplot as plt
 from sklearn.metrics import (accuracy_score, precision_score, recall_score,
                              f1_score, confusion_matrix, classification_report,
                              ConfusionMatrixDisplay)
 import joblib
+
+ROOT = Path(__file__).resolve().parent.parent
+
+SVM_DATA_DIR = ROOT / 'data' / 'svm'
+SVM_MODEL_DIR = ROOT / 'results' / 'models' / 'svm'
+SVM_PRED_DIR = ROOT / 'results' / 'predictions' / 'svm'
+FIGURES_DIR = ROOT / 'results' / 'figures'
 
 plt.rcParams['figure.figsize'] = [16, 10]
 
@@ -19,28 +27,29 @@ print("="*80)
 
 IDADES = sorted([
     int(f.replace('dataset_idade_', '').replace('.csv', ''))
-    for f in os.listdir('.')
+    for f in os.listdir(SVM_DATA_DIR)
     if f.startswith('dataset_idade_') and f.endswith('.csv')
     and f.replace('dataset_idade_', '').replace('.csv', '').isdigit()
     and 0 <= int(f.replace('dataset_idade_', '').replace('.csv', '')) <= 115
 ])
 print(f"Datasets encontrados: {IDADES}")
 
-os.makedirs('predicoes_svm', exist_ok=True)
+SVM_PRED_DIR.mkdir(parents=True, exist_ok=True)
+FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
 todos_resultados = []
 resumo = []
 dados_plot = []
 
 for idade in IDADES:
-    arquivo = f'dataset_idade_{idade}.csv'
-    modelo_path = f'modelos_svm/modelo_svm_idade_{idade}.joblib'
+    arquivo = SVM_DATA_DIR / f'dataset_idade_{idade}.csv'
+    modelo_path = SVM_MODEL_DIR / f'modelo_svm_idade_{idade}.joblib'
 
-    if not os.path.exists(arquivo):
+    if not arquivo.exists():
         print(f"\nArquivo {arquivo} nao encontrado, pulando...")
         continue
 
-    if not os.path.exists(modelo_path):
+    if not modelo_path.exists():
         print(f"\nModelo {modelo_path} nao encontrado, pulando...")
         print("Execute svm_treino.py primeiro para gerar os modelos.")
         continue
@@ -155,7 +164,7 @@ for idade in IDADES:
             'acc': None, 'prec': None, 'rec': None, 'f1': None, 'f1_cv': cv_score
         })
 
-    csv_path = f'predicoes_svm/predicoes_svm_idade_{idade}.csv'
+    csv_path = SVM_PRED_DIR / f'predicoes_svm_idade_{idade}.csv'
     resultado_idade[['ANIMAL', 'IDADE', 'SEXO_PREDITO']].to_csv(
         csv_path, sep=';', index=False, encoding='utf-8'
     )
@@ -167,7 +176,7 @@ if todos_resultados:
     resultado_final = pd.concat(todos_resultados, ignore_index=True)
 
     resultado_final[['ANIMAL', 'IDADE', 'SEXO_PREDITO']].to_csv(
-        'predicoes_svm/predicoes_svm_todas_idades.csv',
+        SVM_PRED_DIR / 'predicoes_svm_todas_idades.csv',
         sep=';', index=False, encoding='utf-8'
     )
 
@@ -187,12 +196,12 @@ if todos_resultados:
             print(f"{r['idade']:6d} | {r['n_animais']:6d} | {r['f1_cv']:8.4f} |"
                   f"     N/A |      N/A |      N/A |      N/A")
 
-    print(f"\nArquivos gerados na pasta 'predicoes_svm/':")
+    print(f"\nArquivos gerados na pasta '{SVM_PRED_DIR}':")
     for idade in IDADES:
-        path = f'predicoes_svm/predicoes_svm_idade_{idade}.csv'
-        if os.path.exists(path):
+        path = SVM_PRED_DIR / f'predicoes_svm_idade_{idade}.csv'
+        if path.exists():
             print(f"  - {path}")
-    print(f"  - predicoes_svm/predicoes_svm_todas_idades.csv (consolidado)")
+    print(f"  - {SVM_PRED_DIR / 'predicoes_svm_todas_idades.csv'} (consolidado)")
 
 if dados_plot and resumo:
     resumo_valido = [r for r in resumo if r['f1'] is not None]
@@ -264,9 +273,9 @@ if dados_plot and resumo:
     plt.grid(True, alpha=0.3, axis='y')
 
     plt.tight_layout()
-    plt.savefig('resultado_svm_teste_geral.png', dpi=150, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'resultado_svm_teste_geral.png', dpi=150, bbox_inches='tight')
     plt.show()
-    print(f"\nGrafico geral salvo em: resultado_svm_teste_geral.png")
+    print(f"\nGrafico geral salvo em: {FIGURES_DIR / 'resultado_svm_teste_geral.png'}")
 
     n_idades = len(dados_plot)
     n_cols = min(4, n_idades)
@@ -289,9 +298,9 @@ if dados_plot and resumo:
         axes_flat[idx].set_visible(False)
 
     plt.tight_layout()
-    plt.savefig('resultado_svm_teste_confusao.png', dpi=150, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'resultado_svm_teste_confusao.png', dpi=150, bbox_inches='tight')
     plt.show()
-    print(f"Grafico de matrizes de confusao salvo em: resultado_svm_teste_confusao.png")
+    print(f"Grafico de matrizes de confusao salvo em: {FIGURES_DIR / 'resultado_svm_teste_confusao.png'}")
 
     fig3, axes3 = plt.subplots(1, 3, figsize=(18, 5))
     fig3.suptitle('Predicao de Sexo - Comparacao de Desempenho no Conjunto de Teste (SVM)',
@@ -316,9 +325,9 @@ if dados_plot and resumo:
         ax.tick_params(axis='x', rotation=30)
 
     plt.tight_layout()
-    plt.savefig('resultado_svm_teste_comparacao.png', dpi=150, bbox_inches='tight')
+    plt.savefig(FIGURES_DIR / 'resultado_svm_teste_comparacao.png', dpi=150, bbox_inches='tight')
     plt.show()
-    print(f"Grafico de comparacao salvo em: resultado_svm_teste_comparacao.png")
+    print(f"Grafico de comparacao salvo em: {FIGURES_DIR / 'resultado_svm_teste_comparacao.png'}")
 
 print(f"\n{'='*80}")
 print("TESTE CONCLUIDO!")

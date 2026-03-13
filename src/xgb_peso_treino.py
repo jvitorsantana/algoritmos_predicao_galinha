@@ -4,11 +4,17 @@ warnings.filterwarnings('ignore')
 import os
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from sklearn.model_selection import RandomizedSearchCV, KFold
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from xgboost import XGBRegressor
 from scipy.stats import randint, uniform
 import joblib
+
+ROOT = Path(__file__).resolve().parent.parent
+
+DATA_DIR = ROOT / 'data' / 'processed'
+MODEL_DIR = ROOT / 'results' / 'models' / 'xgb_peso'
 
 print("="*80)
 print("TREINAMENTO - PREDICAO DE PESO POR IDADE (XGBoost)")
@@ -20,7 +26,7 @@ IDADES = [0, 7, 14, 21, 28, 52, 66, 80, 101, 115]
 FEATURES_MORFOMETRICAS = ['CIRCFABDOM', 'DORSO', 'CANELA', 'ASA', 'COXA',
                           'BICO', 'CIRCFCABECA', 'PESCOCO', 'SOBRECOXA']
 
-os.makedirs('modelos', exist_ok=True)
+MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
 N_ROUNDS = 10
 N_ITER_PER_ROUND = 10
@@ -42,9 +48,9 @@ cv = KFold(n_splits=5, shuffle=True, random_state=42)
 resultados = []
 
 for idade in IDADES:
-    arquivo = f'datasets/dataset_idade_{idade}.csv'
+    arquivo = DATA_DIR / f'dataset_idade_{idade}.csv'
 
-    if not os.path.exists(arquivo):
+    if not arquivo.exists():
         print(f"\nArquivo {arquivo} nao encontrado, pulando...")
         continue
 
@@ -141,7 +147,7 @@ for idade in IDADES:
     for name, imp in sorted(zip(features_disponiveis, fi), key=lambda x: -x[1]):
         print(f"    {name}: {imp:.4f}")
 
-    modelo_path = f'modelos/modelo_idade_{idade}.joblib'
+    modelo_path = MODEL_DIR / f'modelo_idade_{idade}.joblib'
     joblib.dump({
         'model': best_model,
         'features': features_disponiveis,
@@ -170,5 +176,5 @@ for r in resultados:
 print(f"\n{'='*80}")
 print("TREINAMENTO CONCLUIDO!")
 print(f"Total de modelos treinados: {len(resultados)}")
-print(f"Modelos salvos na pasta 'modelos/'")
+print(f"Modelos salvos na pasta '{MODEL_DIR}'")
 print(f"{'='*80}")
