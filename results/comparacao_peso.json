@@ -1,0 +1,64 @@
+{
+  "model": "Random Forest",
+  "r2_cv": 0.944714420560917,
+  "r2_test": 0.9453063220323304,
+  "rmse": 107.12333265934343,
+  "mae": 68.61281025927416,
+  "features": [
+    "IDADE",
+    "BICO",
+    "CIRCFCABECA",
+    "PESCOCO",
+    "ASA",
+    "TULIPA",
+    "DORSO",
+    "VENTRE",
+    "CIRCFABDOM",
+    "SOBRECOXA",
+    "COXA",
+    "CANELA",
+    "UNHAMAIOR"
+  ],
+  "ranking": [
+    {
+      "name": "Random Forest",
+      "r2_test": 0.9453
+    },
+    {
+      "name": "Extra Trees",
+      "r2_test": 0.9449
+    },
+    {
+      "name": "Gradient Boosting",
+      "r2_test": 0.9419
+    },
+    {
+      "name": "XGBoost",
+      "r2_test": 0.9418
+    },
+    {
+      "name": "LightGBM",
+      "r2_test": 0.9399
+    },
+    {
+      "name": "KNN",
+      "r2_test": 0.9393
+    },
+    {
+      "name": "Lasso",
+      "r2_test": 0.9269
+    },
+    {
+      "name": "Ridge",
+      "r2_test": 0.9263
+    },
+    {
+      "name": "ElasticNet",
+      "r2_test": 0.9235
+    },
+    {
+      "name": "SVR",
+      "r2_test": 0.9162
+    }
+  ]
+}

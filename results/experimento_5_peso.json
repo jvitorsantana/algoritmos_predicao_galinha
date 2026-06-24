@@ -1,0 +1,136 @@
+{
+  "experiment": "experimento_5_peso",
+  "approach": "XGBoost on full dataset (no per-age split), top features by cumulative gain importance",
+  "include_idade": false,
+  "cumulative_threshold": 0.95,
+  "candidate_features": [
+    "BICO",
+    "CIRCFCABECA",
+    "PESCOCO",
+    "ASA",
+    "TULIPA",
+    "DORSO",
+    "VENTRE",
+    "CIRCFABDOM",
+    "SOBRECOXA",
+    "COXA",
+    "CANELA",
+    "UNHAMAIOR"
+  ],
+  "selected_features": [
+    "CIRCFABDOM",
+    "CIRCFCABECA",
+    "SOBRECOXA",
+    "DORSO",
+    "ASA",
+    "UNHAMAIOR",
+    "VENTRE"
+  ],
+  "dropped_features": [
+    "BICO",
+    "PESCOCO",
+    "TULIPA",
+    "COXA",
+    "CANELA"
+  ],
+  "feature_importance": {
+    "CIRCFABDOM": 0.5378,
+    "CIRCFCABECA": 0.2087,
+    "SOBRECOXA": 0.0631,
+    "DORSO": 0.0585,
+    "ASA": 0.0366,
+    "UNHAMAIOR": 0.0294,
+    "VENTRE": 0.0249,
+    "PESCOCO": 0.0152,
+    "COXA": 0.0078,
+    "BICO": 0.0071,
+    "CANELA": 0.0056,
+    "TULIPA": 0.0053
+  },
+  "final_model": {
+    "r2_cv": 0.9379,
+    "r2_test": 0.9388,
+    "rmse": 113.33,
+    "mae": 73.69,
+    "pct_mae": 13.05
+  },
+  "full_model": {
+    "r2_cv": 0.939,
+    "r2_test": 0.9391,
+    "rmse": 113.0,
+    "mae": 73.83
+  },
+  "per_age": [
+    {
+      "age": 0,
+      "r2": -5.055181098806273,
+      "mae": 11.56847990320084,
+      "n": 47
+    },
+    {
+      "age": 7,
+      "r2": -1.8804274007495834,
+      "mae": 13.070349997662483,
+      "n": 47
+    },
+    {
+      "age": 14,
+      "r2": -0.8536365286675436,
+      "mae": 30.252810796101887,
+      "n": 48
+    },
+    {
+      "age": 21,
+      "r2": -0.5475172385821476,
+      "mae": 62.902644613514774,
+      "n": 46
+    },
+    {
+      "age": 28,
+      "r2": -0.7781097876222043,
+      "mae": 82.72050995522358,
+      "n": 47
+    },
+    {
+      "age": 38,
+      "r2": 0.5175269215496721,
+      "mae": 65.30179677111038,
+      "n": 47
+    },
+    {
+      "age": 52,
+      "r2": 0.5061609318755791,
+      "mae": 84.03182779947916,
+      "n": 45
+    },
+    {
+      "age": 66,
+      "r2": 0.18548146788434317,
+      "mae": 121.44248630689538,
+      "n": 46
+    },
+    {
+      "age": 80,
+      "r2": 0.22495178954956419,
+      "mae": 125.41489428143169,
+      "n": 43
+    },
+    {
+      "age": 101,
+      "r2": -0.39429134424992296,
+      "mae": 175.83215087890625,
+      "n": 25
+    },
+    {
+      "age": 115,
+      "r2": 0.03411719234000277,
+      "mae": 107.56871150090144,
+      "n": 26
+    }
+  ],
+  "mean_per_age_r2": -0.731,
+  "figures": [
+    "experimento_5_peso.png",
+    "experimento_5_features.png"
+  ]
+}

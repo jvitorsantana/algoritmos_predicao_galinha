@@ -1,0 +1,57 @@
+{
+  "experiment": "experimento_4_sexo",
+  "approach": "growth features + rolling-mean (window=3) forecast",
+  "model": "Extra Trees",
+  "f1_cv": 0.6329740254515566,
+  "f1_test": 0.5639686684073107,
+  "acc": 0.5582010582010583,
+  "baseline_acc": 0.4417989417989418,
+  "forecast_mae": 293.73945727906124,
+  "forecast_rmse": 329.5349155602173,
+  "features": [
+    "IDADE",
+    "PESO",
+    "PESO_PRED_MA",
+    "PESO_RESID",
+    "GANHO_PESO",
+    "TAXA_CRESC",
+    "TAXA_CRESC_MA",
+    "PESO_ACUM_MA",
+    "SLOPE_IA"
+  ],
+  "window": 3,
+  "ranking": [
+    {
+      "name": "Extra Trees",
+      "f1_test": 0.564
+    },
+    {
+      "name": "XGBoost",
+      "f1_test": 0.5441
+    },
+    {
+      "name": "Random Forest",
+      "f1_test": 0.5316
+    },
+    {
+      "name": "Gradient Boosting",
+      "f1_test": 0.5269
+    },
+    {
+      "name": "LightGBM",
+      "f1_test": 0.51
+    },
+    {
+      "name": "SVM",
+      "f1_test": 0.4889
+    },
+    {
+      "name": "KNN",
+      "f1_test": 0.4874
+    },
+    {
+      "name": "Logistic Regression",
+      "f1_test": 0.427
+    }
+  ]
+}

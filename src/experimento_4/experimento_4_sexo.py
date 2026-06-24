@@ -1,6 +1,13 @@
 """
 CRISP-DM Phase 4: Modeling - Sex Classification
-Trains and compares multiple classification models.
+Experiment 4: Growth relationship (IDADE x PESO) with rolling-mean forecast.
+
+Idea:
+  - Each animal has a time-series of (IDADE, PESO).
+  - Build growth features: rolling mean of the last N weights (predicts next),
+    residual between actual and predicted weight, growth rates, slope of
+    weight vs age, etc.
+  - Use these features to classify SEXO.
 """
 import warnings
 warnings.filterwarnings('ignore')
@@ -20,7 +27,8 @@ from sklearn.metrics import (
     confusion_matrix, classification_report
 )
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.pipeline import Pipeline
+from imblearn.pipeline import Pipeline
+from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import (
     RandomForestClassifier, ExtraTreesClassifier, GradientBoostingClassifier
 )
@@ -31,41 +39,103 @@ from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from scipy.stats import randint, uniform
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 RESULTS = ROOT / 'results'
 FIGURES = RESULTS / 'figures'
 FIGURES.mkdir(parents=True, exist_ok=True)
+
+# Rolling window: how many previous measurements to average when predicting next PESO
+WINDOW = 3
 
 # =============================================================================
 # DATA PREPARATION
 # =============================================================================
 print("=" * 80)
-print("SEX CLASSIFICATION - MODEL COMPARISON")
+print("SEX CLASSIFICATION - EXPERIMENT 4 (growth + rolling-mean forecast)")
 print("=" * 80)
 
 df = pd.read_csv(ROOT / 'data' / 'raw' / 'dataset.csv', sep=';', decimal='.', encoding='utf-8')
 
-FEATURES = ['PESO', 'IDADE', 'BICO', 'CIRCFCABECA', 'PESCOCO', 'ASA', 'TULIPA',
-            'DORSO', 'VENTRE', 'CIRCFABDOM', 'SOBRECOXA', 'COXA', 'CANELA', 'UNHAMAIOR']
+BASE_FEATURES = ['PESO', 'IDADE', 'BICO', 'CIRCFCABECA', 'PESCOCO', 'ASA', 'TULIPA',
+                 'DORSO', 'VENTRE', 'CIRCFABDOM', 'SOBRECOXA', 'COXA', 'CANELA', 'UNHAMAIOR']
 
-for col in FEATURES:
+for col in BASE_FEATURES:
     df[col] = pd.to_numeric(df[col], errors='coerce')
 
-# Remove ages with too few samples and rows with missing sex
-age_counts = df['IDADE'].value_counts()
-valid_ages = age_counts[age_counts >= 10].index
-df = df[df['IDADE'].isin(valid_ages)]
-df = df.dropna(subset=['SEXO'])
+df = df.dropna(subset=['SEXO', 'ANIMAL', 'IDADE', 'PESO'])
+df = df.sort_values(['ANIMAL', 'IDADE']).reset_index(drop=True)
 
-df_clean = df.dropna(subset=FEATURES)
+# =============================================================================
+# FEATURE ENGINEERING: GROWTH RELATIONSHIP (IDADE x PESO)
+# =============================================================================
+# For each animal, build time-series features from PESO x IDADE.
+# PESO_PRED_MA: mean of the last WINDOW weights — our "forecast" for next PESO.
+# PESO_RESID:   actual PESO minus predicted (how much animal deviates from its own trend).
+# GANHO_PESO:   weight gain since previous measurement.
+# TAXA_CRESC:   growth rate = GANHO_PESO / delta(IDADE).
+# TAXA_CRESC_MA:rolling mean of growth rate over last WINDOW steps.
+# PESO_ACUM_MA: overall average weight per animal up to current row.
+# SLOPE_IA:     linear regression slope of PESO vs IDADE up to current row.
+
+def _rolling_past_mean(s: pd.Series, window: int) -> pd.Series:
+    return s.shift(1).rolling(window=window, min_periods=1).mean()
+
+
+def _past_slope(group: pd.DataFrame) -> pd.Series:
+    g = group.sort_index()
+    slopes = [np.nan] * len(g)
+    for i in range(2, len(g)):
+        x = g['IDADE'].iloc[:i].values
+        y = g['PESO'].iloc[:i].values
+        if np.ptp(x) > 0:
+            slopes[i] = np.polyfit(x, y, 1)[0]
+    return pd.Series(slopes, index=g.index)
+
+
+grp_peso = df.groupby('ANIMAL')['PESO']
+grp_idade = df.groupby('ANIMAL')['IDADE']
+
+# Rolling-mean forecast of next PESO using the last `window` weights (shifted so we
+# only use past values — avoids leakage from the current row).
+df['PESO_PRED_MA'] = grp_peso.transform(lambda s: _rolling_past_mean(s, WINDOW))
+df['PESO_RESID'] = df['PESO'] - df['PESO_PRED_MA']
+
+# Weight gain / growth rate vs previous measurement of the same animal.
+prev_peso = grp_peso.shift(1)
+prev_idade = grp_idade.shift(1)
+df['GANHO_PESO'] = df['PESO'] - prev_peso
+delta_idade = (df['IDADE'] - prev_idade).replace(0, np.nan)
+df['TAXA_CRESC'] = df['GANHO_PESO'] / delta_idade
+df['TAXA_CRESC_MA'] = df.groupby('ANIMAL')['TAXA_CRESC'].transform(
+    lambda s: _rolling_past_mean(s, WINDOW)
+)
+
+# Cumulative mean of past weights (animal's baseline so far).
+df['PESO_ACUM_MA'] = grp_peso.transform(lambda s: s.shift(1).expanding(min_periods=1).mean())
+
+# Linear-regression slope of PESO vs IDADE over all past observations of the animal.
+df['SLOPE_IA'] = df.groupby('ANIMAL', group_keys=False).apply(_past_slope)
+
+GROWTH_FEATURES = ['IDADE', 'PESO', 'PESO_PRED_MA', 'PESO_RESID',
+                   'GANHO_PESO', 'TAXA_CRESC', 'TAXA_CRESC_MA',
+                   'PESO_ACUM_MA', 'SLOPE_IA']
+FEATURES = GROWTH_FEATURES
+
+# Drop rows where we don't yet have enough history for a growth signal.
+df_clean = df.dropna(subset=FEATURES).copy()
 
 le = LabelEncoder()
-df_clean = df_clean.copy()
 df_clean['SEXO_NUM'] = le.fit_transform(df_clean['SEXO'])
 
 print(f"Classes: {dict(zip(le.classes_, le.transform(le.classes_)))}")
 print(f"Records after cleaning: {len(df_clean)}")
 print(f"Class distribution:\n{df_clean['SEXO'].value_counts()}")
+print(f"Features: {FEATURES}")
+
+# Sanity check on forecast quality (rolling-mean as a PESO predictor).
+mae = (df_clean['PESO'] - df_clean['PESO_PRED_MA']).abs().mean()
+rmse = np.sqrt(((df_clean['PESO'] - df_clean['PESO_PRED_MA']) ** 2).mean())
+print(f"\nRolling-mean PESO forecast — MAE: {mae:.2f} g | RMSE: {rmse:.2f} g (window={WINDOW})")
 
 # Split by animal
 animals = df_clean['ANIMAL'].unique()
@@ -94,9 +164,8 @@ cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 MODELS = {
     'XGBoost': {
-        'pipeline': Pipeline([('model', XGBClassifier(
+        'pipeline': Pipeline([('smote', SMOTE(random_state=42)), ('model', XGBClassifier(
             random_state=42, n_jobs=-1, eval_metric='logloss',
-            scale_pos_weight=scale_weight
         ))]),
         'params': {
             'model__n_estimators': randint(50, 500),
@@ -112,9 +181,8 @@ MODELS = {
         'n_iter': 50,
     },
     'LightGBM': {
-        'pipeline': Pipeline([('model', LGBMClassifier(
+        'pipeline': Pipeline([('smote', SMOTE(random_state=42)), ('model', LGBMClassifier(
             random_state=42, n_jobs=-1, verbose=-1,
-            is_unbalance=True
         ))]),
         'params': {
             'model__n_estimators': randint(50, 500),
@@ -129,8 +197,8 @@ MODELS = {
         'n_iter': 50,
     },
     'Random Forest': {
-        'pipeline': Pipeline([('model', RandomForestClassifier(
-            random_state=42, n_jobs=-1, class_weight='balanced'
+        'pipeline': Pipeline([('smote', SMOTE(random_state=42)), ('model', RandomForestClassifier(
+            random_state=42, n_jobs=-1,
         ))]),
         'params': {
             'model__n_estimators': randint(100, 600),
@@ -142,8 +210,8 @@ MODELS = {
         'n_iter': 30,
     },
     'Extra Trees': {
-        'pipeline': Pipeline([('model', ExtraTreesClassifier(
-            random_state=42, n_jobs=-1, class_weight='balanced'
+        'pipeline': Pipeline([('smote', SMOTE(random_state=42)), ('model', ExtraTreesClassifier(
+            random_state=42, n_jobs=-1,
         ))]),
         'params': {
             'model__n_estimators': randint(100, 600),
@@ -155,7 +223,7 @@ MODELS = {
         'n_iter': 30,
     },
     'Gradient Boosting': {
-        'pipeline': Pipeline([('model', GradientBoostingClassifier(random_state=42))]),
+        'pipeline': Pipeline([('smote', SMOTE(random_state=42)), ('model', GradientBoostingClassifier(random_state=42))]),
         'params': {
             'model__n_estimators': randint(50, 400),
             'model__max_depth': randint(2, 7),
@@ -169,7 +237,8 @@ MODELS = {
     'SVM': {
         'pipeline': Pipeline([
             ('scaler', StandardScaler()),
-            ('model', SVC(class_weight='balanced', probability=True)),
+            ('smote', SMOTE(random_state=42)),
+            ('model', SVC(probability=True)),
         ]),
         'params': {
             'model__C': uniform(0.01, 100),
@@ -181,6 +250,7 @@ MODELS = {
     'KNN': {
         'pipeline': Pipeline([
             ('scaler', StandardScaler()),
+            ('smote', SMOTE(random_state=42)),
             ('model', KNeighborsClassifier()),
         ]),
         'params': {
@@ -193,7 +263,8 @@ MODELS = {
     'Logistic Regression': {
         'pipeline': Pipeline([
             ('scaler', StandardScaler()),
-            ('model', LogisticRegression(class_weight='balanced', max_iter=2000)),
+            ('smote', SMOTE(random_state=42)),
+            ('model', LogisticRegression(max_iter=2000)),
         ]),
         'params': {
             'model__C': uniform(0.001, 100),
@@ -271,7 +342,7 @@ for name, config in MODELS.items():
 results.sort(key=lambda x: x['f1_test'], reverse=True)
 
 print(f"\n{'='*80}")
-print("MODEL COMPARISON (sorted by F1 Test)")
+print("MODEL COMPARISON (sorted by F1 Test) - GROWTH FEATURES")
 print(f"{'='*80}")
 print(f"{'Model':<20} | {'F1 CV':>8} | {'F1 Test':>8} | {'Acc':>8} | {'Prec':>8} | {'Rec':>8}")
 print("-" * 75)
@@ -323,7 +394,7 @@ print(classification_report(y_test, results[0]['y_pred'],
 # PLOTS
 # =============================================================================
 fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-fig.suptitle('Sex Classification - Model Comparison', fontsize=16, fontweight='bold')
+fig.suptitle('Classificação de Sexo - Experimento 4 (Features de Crescimento)', fontsize=16, fontweight='bold')
 
 # 1. F1 comparison
 ax = axes[0, 0]
@@ -331,25 +402,25 @@ names = [r['name'] for r in results]
 f1_cv_vals = [r['f1_cv'] for r in results]
 f1_test_vals = [r['f1_test'] for r in results]
 x = np.arange(len(names))
-ax.bar(x - 0.2, f1_cv_vals, 0.35, label='F1 CV', alpha=0.8, color='steelblue')
-ax.bar(x + 0.2, f1_test_vals, 0.35, label='F1 Test', alpha=0.8, color='coral')
+ax.bar(x - 0.2, f1_cv_vals, 0.35, label='F1 Validação Cruzada', alpha=0.8, color='steelblue')
+ax.bar(x + 0.2, f1_test_vals, 0.35, label='F1 Teste', alpha=0.8, color='coral')
 ax.set_xticks(x)
 ax.set_xticklabels(names, rotation=45, ha='right', fontsize=8)
-ax.set_ylabel('F1 Score')
-ax.set_title('F1 Score by Model')
-ax.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5, label='Random baseline')
+ax.set_ylabel('Pontuação F1')
+ax.set_title('Pontuação F1 por Modelo')
+ax.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5, label='Linha de base aleatória')
 ax.legend(fontsize=8)
 ax.grid(True, alpha=0.3, axis='y')
 
 # 2. Metrics comparison (best model)
 ax = axes[0, 1]
 best = results[0]
-metrics = ['Accuracy', 'Precision', 'Recall', 'F1']
+metrics = ['Acurácia', 'Precisão', 'Revocação', 'F1']
 vals = [best['acc'], best['prec'], best['rec'], best['f1_test']]
 colors = ['steelblue', 'green', 'orange', 'coral']
 ax.bar(metrics, vals, color=colors, alpha=0.7)
 ax.set_ylim(0, 1)
-ax.set_title(f'Best Model: {best["name"]}')
+ax.set_title(f'Melhor Modelo: {best["name"]}')
 ax.grid(True, alpha=0.3, axis='y')
 for i, v in enumerate(vals):
     ax.text(i, v + 0.02, f'{v:.3f}', ha='center', fontsize=10)
@@ -358,7 +429,7 @@ for i, v in enumerate(vals):
 ax = axes[1, 0]
 cm = confusion_matrix(y_test, results[0]['y_pred'])
 im = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-ax.set_title(f'Confusion Matrix - {results[0]["name"]}')
+ax.set_title(f'Matriz de Confusão - {results[0]["name"]}')
 plt.colorbar(im, ax=ax)
 ax.set_xticks([0, 1])
 ax.set_yticks([0, 1])
@@ -370,38 +441,39 @@ for i in range(2):
         ax.text(j, i, str(cm[i, j]), ha='center', va='center',
                 color='white' if cm[i, j] > thresh else 'black', fontsize=14)
 ax.set_ylabel('Real')
-ax.set_xlabel('Predicted')
+ax.set_xlabel('Previsto')
 
-# 4. Per-age accuracy for top 3
+# 4. Growth curves by sex (mean PESO vs IDADE)
 ax = axes[1, 1]
-for r in top3:
-    ages_acc = [a['age'] for a in r['per_age']]
-    vals_acc = [a['acc'] for a in r['per_age']]
-    ax.plot(ages_acc, vals_acc, marker='o', label=r['name'], linewidth=2, markersize=5)
-ax.axhline(y=baseline_acc, color='gray', linestyle='--', alpha=0.5, label='Majority baseline')
-ax.axhline(y=0.5, color='red', linestyle='--', alpha=0.3, label='Random (50%)')
-ax.set_xlabel('Age (days)')
-ax.set_ylabel('Accuracy')
-ax.set_title('Per-Age Accuracy - Top 3 Models')
-ax.legend(fontsize=7)
+for sexo, sub in df_clean.groupby('SEXO'):
+    grp = sub.groupby('IDADE')['PESO'].mean()
+    ax.plot(grp.index, grp.values, marker='o', label=f'{sexo} (média)', linewidth=2)
+ax.set_xlabel('IDADE (dias)')
+ax.set_ylabel('PESO (g)')
+ax.set_title('Curva de Crescimento por Sexo')
+ax.legend(fontsize=9)
 ax.grid(True, alpha=0.3)
-ax.set_ylim(0, 1.05)
 
 plt.tight_layout()
-plt.savefig(FIGURES / 'comparacao_sexo.png', dpi=150, bbox_inches='tight')
-print(f"\nPlot saved: resultados/comparacao_sexo.png")
+plt.savefig(FIGURES / 'experimento_4_sexo.png', dpi=150, bbox_inches='tight')
+print(f"\nPlot saved: results/figures/experimento_4_sexo.png")
 
 # Save results
 best_info = {
+    'experiment': 'experimento_4_sexo',
+    'approach': f'growth features + rolling-mean (window={WINDOW}) forecast',
     'model': results[0]['name'],
     'f1_cv': results[0]['f1_cv'],
     'f1_test': results[0]['f1_test'],
     'acc': results[0]['acc'],
     'baseline_acc': float(baseline_acc),
+    'forecast_mae': float(mae),
+    'forecast_rmse': float(rmse),
     'features': FEATURES,
+    'window': WINDOW,
     'ranking': [{'name': r['name'], 'f1_test': round(r['f1_test'], 4)} for r in results]
 }
-with open(RESULTS / 'comparacao_sexo.json', 'w') as f:
+with open(RESULTS / 'experimento_4_sexo.json', 'w') as f:
     json.dump(best_info, f, indent=2)
 
 print(f"\n{'='*80}")
@@ -409,6 +481,5 @@ print(f"BEST MODEL: {results[0]['name']} (F1={results[0]['f1_test']:.4f}, Acc={r
 print(f"Majority baseline: Acc={baseline_acc:.4f}")
 if results[0]['acc'] < baseline_acc + 0.05:
     print("\nWARNING: Best model barely beats the majority baseline.")
-    print("The morphometric features may not carry enough signal to classify sex.")
-    print("Consider adding non-morphometric features or accepting this limitation.")
+    print("The growth features may not carry enough signal to classify sex.")
 print(f"{'='*80}")

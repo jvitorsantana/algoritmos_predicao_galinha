@@ -1,0 +1,84 @@
+{
+  "experiment": "experimento_6",
+  "regression": {
+    "model": "XGBoost Regressor",
+    "features": [
+      "IDADE",
+      "BICO",
+      "CIRCFCABECA",
+      "PESCOCO",
+      "ASA",
+      "TULIPA",
+      "DORSO",
+      "VENTRE",
+      "CIRCFABDOM",
+      "SOBRECOXA",
+      "COXA",
+      "CANELA",
+      "UNHAMAIOR"
+    ],
+    "r2_test": 0.9404,
+    "rmse": 113.95,
+    "mae": 69.89,
+    "importance": {
+      "CIRCFABDOM": 0.5031,
+      "IDADE": 0.1859,
+      "CIRCFCABECA": 0.101,
+      "DORSO": 0.0883,
+      "SOBRECOXA": 0.0361,
+      "VENTRE": 0.0359,
+      "ASA": 0.0107,
+      "COXA": 0.0078,
+      "UNHAMAIOR": 0.0073,
+      "PESCOCO": 0.007,
+      "BICO": 0.0068,
+      "TULIPA": 0.0054,
+      "CANELA": 0.0047
+    }
+  },
+  "classification": {
+    "model": "XGBoost Classifier",
+    "features": [
+      "PESO",
+      "IDADE",
+      "BICO",
+      "CIRCFCABECA",
+      "PESCOCO",
+      "ASA",
+      "TULIPA",
+      "DORSO",
+      "VENTRE",
+      "CIRCFABDOM",
+      "SOBRECOXA",
+      "COXA",
+      "CANELA",
+      "UNHAMAIOR"
+    ],
+    "positive_class": "Macho",
+    "auc_cv": 0.5654,
+    "auc_test": 0.6023,
+    "accuracy": 0.5573,
+    "f1": 0.6097,
+    "importance": {
+      "IDADE": 0.0917,
+      "UNHAMAIOR": 0.0841,
+      "CANELA": 0.0779,
+      "CIRCFABDOM": 0.0754,
+      "CIRCFCABECA": 0.0715,
+      "COXA": 0.0714,
+      "PESO": 0.0692,
+      "DORSO": 0.0673,
+      "SOBRECOXA": 0.067,
+      "BICO": 0.0661,
+      "VENTRE": 0.0653,
+      "PESCOCO": 0.065,
+      "TULIPA": 0.0644,
+      "ASA": 0.0637
+    }
+  },
+  "figures": [
+    "experimento_6_importancia_peso.png",
+    "experimento_6_importancia_sexo.png",
+    "experimento_6_roc_sexo.png"
+  ]
+}
