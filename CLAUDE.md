@@ -4,7 +4,8 @@
 Research project (CRISP-DM) using ML to predict chicken weight and classify sex from morphometric measurements.
 
 ## Structure
-- `data/raw/dataset.csv` - Main dataset (2299 records, 238 animals, 13 features)
+- `data/raw/dataset.csv` - Main dataset (2299 records, 235 animals, 13 features). Cleaned in place: 12 decimal-point ("comma") fixes + per-animal majority SEXO (one bird = one sex). Note: `238` unique is a string-count artifact of asterisk-flagged ids (`*181` etc.); real count is 235.
+- `data/raw/dataset_original.csv` - Pristine raw backup (before any cleaning); used by experimento_7
 - `data/svm/` - Per-age enriched datasets (extra columns: PESO_ANTERIOR, GANHO_PESO)
 - `src/eda.py` - Exploratory Data Analysis (CRISP-DM Phase 2), shared across experiments
 - `src/experimento_1/` - Per-age models: XGBoost (weight) + SVM (sex), one model per age
@@ -13,6 +14,8 @@ Research project (CRISP-DM) using ML to predict chicken weight and classify sex 
 - `src/experimento_4/` - Growth-trajectory features (rolling mean, growth rate, slope) for sex classification
 - `src/experimento_5/` - XGBoost weight regression on full dataset using only the most impactful morphometric features (data-driven selection; IDADE excluded by default via INCLUDE_IDADE flag)
 - `src/experimento_6/` - Feature importance (XGBoost) for both weight regression and sex classification + ROC curve / AUC for sex
+- `src/experimento_7/` - Data-cleaning robustness check: sex classification on RAW vs CLEANED data (12 comma fixes + per-animal majority SEXO + dedup), GroupKFold by animal. Tests whether label noise (not lack of signal) caused the low sex AUC — result: no change, so signal is genuinely absent
+- `src/figuras/` - Standalone article figures: boxplots by sex, correlation heatmaps (Spearman, aggregate + per-age), PCA and LDA by sex
 - `notebooks/` - Jupyter notebooks (Experiment 2 unified XGBoost weight model)
 - `results/` - Generated outputs (gitignored): figures, models, predictions
 
@@ -24,6 +27,7 @@ uv run python src/experimento_3/comparacao_sexo.py    # Sex model comparison (8 
 uv run python src/experimento_4/experimento_4_sexo.py # Sex via growth features
 uv run python src/experimento_5/experimento_5_peso.py # Weight via XGBoost + top features
 uv run python src/experimento_6/experimento_6.py      # Feature importance (both) + ROC/AUC (sex)
+uv run python src/experimento_7/experimento_7_rotulos_sexo.py  # Sex: raw vs cleaned data (label-noise check)
 ```
 
 ## Key Conventions
