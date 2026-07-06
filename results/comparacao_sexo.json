@@ -26,16 +26,16 @@
       "f1_test": 0.6546
     },
     {
+      "name": "XGBoost",
+      "f1_test": 0.6505
+    },
+    {
       "name": "Random Forest",
       "f1_test": 0.6448
     },
     {
       "name": "Extra Trees",
       "f1_test": 0.6312
-    },
-    {
-      "name": "XGBoost",
-      "f1_test": 0.625
     },
     {
       "name": "LightGBM",

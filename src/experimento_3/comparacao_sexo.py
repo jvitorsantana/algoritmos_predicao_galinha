@@ -17,7 +17,7 @@ from sklearn.model_selection import (
 )
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
-    confusion_matrix, classification_report
+    confusion_matrix, classification_report, precision_recall_fscore_support
 )
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from imblearn.pipeline import Pipeline
@@ -237,6 +237,18 @@ for name, config in MODELS.items():
     f1 = f1_score(y_test, y_pred, zero_division=0)
     f1_cv = search.best_score_
 
+    # Full per-class metrics + confusion matrix (rows=real, cols=predicted)
+    cm = confusion_matrix(y_test, y_pred, labels=range(len(le.classes_)))
+    prec_pc, rec_pc, f1_pc, supp_pc = precision_recall_fscore_support(
+        y_test, y_pred, labels=range(len(le.classes_)), zero_division=0
+    )
+    prec_macro = precision_score(y_test, y_pred, average='macro', zero_division=0)
+    rec_macro = recall_score(y_test, y_pred, average='macro', zero_division=0)
+    f1_macro = f1_score(y_test, y_pred, average='macro', zero_division=0)
+    prec_w = precision_score(y_test, y_pred, average='weighted', zero_division=0)
+    rec_w = recall_score(y_test, y_pred, average='weighted', zero_division=0)
+    f1_w = f1_score(y_test, y_pred, average='weighted', zero_division=0)
+
     print(f"  F1 CV:   {f1_cv:.4f}")
     print(f"  F1 Test: {f1:.4f}")
     print(f"  Acc:     {acc:.4f}")
@@ -262,6 +274,21 @@ for name, config in MODELS.items():
         'acc': acc,
         'prec': prec,
         'rec': rec,
+        'prec_macro': prec_macro,
+        'rec_macro': rec_macro,
+        'f1_macro': f1_macro,
+        'prec_weighted': prec_w,
+        'rec_weighted': rec_w,
+        'f1_weighted': f1_w,
+        'confusion_matrix': cm.tolist(),
+        'per_class': {
+            le.classes_[i]: {
+                'precision': float(prec_pc[i]),
+                'recall': float(rec_pc[i]),
+                'f1': float(f1_pc[i]),
+                'support': int(supp_pc[i]),
+            } for i in range(len(le.classes_))
+        },
         'per_age': per_age,
         'model': best,
         'y_pred': y_pred,
@@ -405,6 +432,39 @@ best_info = {
 }
 with open(RESULTS / 'comparacao_sexo.json', 'w') as f:
     json.dump(best_info, f, indent=2)
+
+# Full per-model metrics + confusion matrices (for the Excel export)
+full_metrics = {
+    'task': 'classification',
+    'target': 'SEXO',
+    'classes': list(le.classes_),
+    'positive_class': le.classes_[1],
+    'baseline_acc': float(baseline_acc),
+    'features': FEATURES,
+    'n_test': int(len(y_test)),
+    'confusion_matrix_format': 'rows = real (true), cols = predicted; order = classes list',
+    'models': [
+        {
+            'name': r['name'],
+            'accuracy': r['acc'],
+            'precision_pos': r['prec'],
+            'recall_pos': r['rec'],
+            'f1_pos': r['f1_test'],
+            'f1_cv': r['f1_cv'],
+            'precision_macro': r['prec_macro'],
+            'recall_macro': r['rec_macro'],
+            'f1_macro': r['f1_macro'],
+            'precision_weighted': r['prec_weighted'],
+            'recall_weighted': r['rec_weighted'],
+            'f1_weighted': r['f1_weighted'],
+            'confusion_matrix': r['confusion_matrix'],
+            'per_class': r['per_class'],
+        } for r in results
+    ],
+}
+with open(RESULTS / 'metricas_completas_sexo.json', 'w') as f:
+    json.dump(full_metrics, f, indent=2, ensure_ascii=False)
+print("Saved: results/metricas_completas_sexo.json")
 
 print(f"\n{'='*80}")
 print(f"BEST MODEL: {results[0]['name']} (F1={results[0]['f1_test']:.4f}, Acc={results[0]['acc']:.4f})")

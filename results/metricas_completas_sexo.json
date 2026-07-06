@@ -1,0 +1,334 @@
+{
+  "task": "classification",
+  "target": "SEXO",
+  "classes": [
+    "Femea",
+    "Macho"
+  ],
+  "positive_class": "Macho",
+  "baseline_acc": 0.5894039735099338,
+  "features": [
+    "PESO",
+    "IDADE",
+    "BICO",
+    "CIRCFCABECA",
+    "PESCOCO",
+    "ASA",
+    "TULIPA",
+    "DORSO",
+    "VENTRE",
+    "CIRCFABDOM",
+    "SOBRECOXA",
+    "COXA",
+    "CANELA",
+    "UNHAMAIOR"
+  ],
+  "n_test": 453,
+  "confusion_matrix_format": "rows = real (true), cols = predicted; order = classes list",
+  "models": [
+    {
+      "name": "Gradient Boosting",
+      "accuracy": 0.5783664459161147,
+      "precision_pos": 0.6328671328671329,
+      "recall_pos": 0.6779026217228464,
+      "f1_pos": 0.6546112115732369,
+      "f1_cv": 0.6403318815829839,
+      "precision_macro": 0.5589485364934467,
+      "recall_macro": 0.5566932463452942,
+      "f1_macro": 0.5567673621605561,
+      "precision_weighted": 0.5721657689576157,
+      "recall_weighted": 0.5783664459161147,
+      "f1_weighted": 0.5742626200025587,
+      "confusion_matrix": [
+        [
+          81,
+          105
+        ],
+        [
+          86,
+          181
+        ]
+      ],
+      "per_class": {
+        "Femea": {
+          "precision": 0.48502994011976047,
+          "recall": 0.43548387096774194,
+          "f1": 0.45892351274787535,
+          "support": 186
+        },
+        "Macho": {
+          "precision": 0.6328671328671329,
+          "recall": 0.6779026217228464,
+          "f1": 0.6546112115732369,
+          "support": 267
+        }
+      }
+    },
+    {
+      "name": "XGBoost",
+      "accuracy": 0.58719646799117,
+      "precision_pos": 0.6492537313432836,
+      "recall_pos": 0.651685393258427,
+      "f1_pos": 0.6504672897196262,
+      "f1_cv": 0.63205657065282,
+      "precision_macro": 0.5732755143202904,
+      "recall_macro": 0.5731545245862028,
+      "f1_macro": 0.573212081517495,
+      "precision_weighted": 0.5868610233244018,
+      "recall_weighted": 0.58719646799117,
+      "f1_weighted": 0.5870259266927105,
+      "confusion_matrix": [
+        [
+          92,
+          94
+        ],
+        [
+          93,
+          174
+        ]
+      ],
+      "per_class": {
+        "Femea": {
+          "precision": 0.4972972972972973,
+          "recall": 0.4946236559139785,
+          "f1": 0.49595687331536387,
+          "support": 186
+        },
+        "Macho": {
+          "precision": 0.6492537313432836,
+          "recall": 0.651685393258427,
+          "f1": 0.6504672897196262,
+          "support": 267
+        }
+      }
+    },
+    {
+      "name": "Random Forest",
+      "accuracy": 0.5695364238410596,
+      "precision_pos": 0.6276595744680851,
+      "recall_pos": 0.6629213483146067,
+      "f1_pos": 0.644808743169399,
+      "f1_cv": 0.6306288981683899,
+      "precision_macro": 0.5506718924972004,
+      "recall_macro": 0.5492026096411743,
+      "f1_macro": 0.5492951278872205,
+      "precision_weighted": 0.5644379018562328,
+      "recall_weighted": 0.5695364238410596,
+      "f1_weighted": 0.5663737213482724,
+      "confusion_matrix": [
+        [
+          81,
+          105
+        ],
+        [
+          90,
+          177
+        ]
+      ],
+      "per_class": {
+        "Femea": {
+          "precision": 0.47368421052631576,
+          "recall": 0.43548387096774194,
+          "f1": 0.453781512605042,
+          "support": 186
+        },
+        "Macho": {
+          "precision": 0.6276595744680851,
+          "recall": 0.6629213483146067,
+          "f1": 0.644808743169399,
+          "support": 267
+        }
+      }
+    },
+    {
+      "name": "Extra Trees",
+      "accuracy": 0.5562913907284768,
+      "precision_pos": 0.6187050359712231,
+      "recall_pos": 0.6441947565543071,
+      "f1_pos": 0.6311926605504588,
+      "f1_cv": 0.6326084521515781,
+      "precision_macro": 0.5379239465570401,
+      "recall_macro": 0.5371511417180138,
+      "f1_macro": 0.5372029784746754,
+      "precision_weighted": 0.5523682473132185,
+      "recall_weighted": 0.5562913907284768,
+      "f1_weighted": 0.5540090805676963,
+      "confusion_matrix": [
+        [
+          80,
+          106
+        ],
+        [
+          95,
+          172
+        ]
+      ],
+      "per_class": {
+        "Femea": {
+          "precision": 0.45714285714285713,
+          "recall": 0.43010752688172044,
+          "f1": 0.44321329639889195,
+          "support": 186
+        },
+        "Macho": {
+          "precision": 0.6187050359712231,
+          "recall": 0.6441947565543071,
+          "f1": 0.6311926605504588,
+          "support": 267
+        }
+      }
+    },
+    {
+      "name": "LightGBM",
+      "accuracy": 0.543046357615894,
+      "precision_pos": 0.6102941176470589,
+      "recall_pos": 0.6217228464419475,
+      "f1_pos": 0.6159554730983302,
+      "f1_cv": 0.6321416642902131,
+      "precision_macro": 0.526141533961651,
+      "recall_macro": 0.525915186661834,
+      "f1_macro": 0.5259613877753231,
+      "precision_weighted": 0.5411886846868563,
+      "recall_weighted": 0.543046357615894,
+      "f1_weighted": 0.5420530454158609,
+      "confusion_matrix": [
+        [
+          80,
+          106
+        ],
+        [
+          101,
+          166
+        ]
+      ],
+      "per_class": {
+        "Femea": {
+          "precision": 0.4419889502762431,
+          "recall": 0.43010752688172044,
+          "f1": 0.4359673024523161,
+          "support": 186
+        },
+        "Macho": {
+          "precision": 0.6102941176470589,
+          "recall": 0.6217228464419475,
+          "f1": 0.6159554730983302,
+          "support": 267
+        }
+      }
+    },
+    {
+      "name": "SVM",
+      "accuracy": 0.5298013245033113,
+      "precision_pos": 0.6071428571428571,
+      "recall_pos": 0.5730337078651685,
+      "f1_pos": 0.5895953757225434,
+      "f1_cv": 0.6065948347664926,
+      "precision_macro": 0.5199893390191898,
+      "recall_macro": 0.5203878216745197,
+      "f1_macro": 0.5196038894116592,
+      "precision_weighted": 0.5355730806704415,
+      "recall_weighted": 0.5298013245033113,
+      "f1_weighted": 0.5321189233877777,
+      "confusion_matrix": [
+        [
+          87,
+          99
+        ],
+        [
+          114,
+          153
+        ]
+      ],
+      "per_class": {
+        "Femea": {
+          "precision": 0.43283582089552236,
+          "recall": 0.46774193548387094,
+          "f1": 0.4496124031007752,
+          "support": 186
+        },
+        "Macho": {
+          "precision": 0.6071428571428571,
+          "recall": 0.5730337078651685,
+          "f1": 0.5895953757225434,
+          "support": 267
+        }
+      }
+    },
+    {
+      "name": "KNN",
+      "accuracy": 0.5496688741721855,
+      "precision_pos": 0.6425339366515838,
+      "recall_pos": 0.5318352059925093,
+      "f1_pos": 0.5819672131147541,
+      "f1_cv": 0.5721825350992018,
+      "precision_macro": 0.5518704166016539,
+      "recall_macro": 0.5535520115984052,
+      "f1_macro": 0.5469644678013962,
+      "precision_weighted": 0.5680817744913765,
+      "recall_weighted": 0.5496688741721855,
+      "f1_weighted": 0.553223236830937,
+      "confusion_matrix": [
+        [
+          107,
+          79
+        ],
+        [
+          125,
+          142
+        ]
+      ],
+      "per_class": {
+        "Femea": {
+          "precision": 0.46120689655172414,
+          "recall": 0.5752688172043011,
+          "f1": 0.5119617224880383,
+          "support": 186
+        },
+        "Macho": {
+          "precision": 0.6425339366515838,
+          "recall": 0.5318352059925093,
+          "f1": 0.5819672131147541,
+          "support": 267
+        }
+      }
+    },
+    {
+      "name": "Logistic Regression",
+      "accuracy": 0.5011037527593819,
+      "precision_pos": 0.593607305936073,
+      "recall_pos": 0.4868913857677903,
+      "f1_pos": 0.5349794238683128,
+      "f1_cv": 0.5525076594997643,
+      "precision_macro": 0.5040686102329938,
+      "recall_macro": 0.5041983810559382,
+      "f1_macro": 0.49844209288653735,
+      "precision_weighted": 0.520078840590498,
+      "recall_weighted": 0.5011037527593819,
+      "f1_weighted": 0.5049752580289741,
+      "confusion_matrix": [
+        [
+          97,
+          89
+        ],
+        [
+          137,
+          130
+        ]
+      ],
+      "per_class": {
+        "Femea": {
+          "precision": 0.41452991452991456,
+          "recall": 0.521505376344086,
+          "f1": 0.46190476190476193,
+          "support": 186
+        },
+        "Macho": {
+          "precision": 0.593607305936073,
+          "recall": 0.4868913857677903,
+          "f1": 0.5349794238683128,
+          "support": 267
+        }
+      }
+    }
+  ]
+}

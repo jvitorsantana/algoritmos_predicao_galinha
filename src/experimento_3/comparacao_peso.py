@@ -385,6 +385,29 @@ best_info = {
 with open(RESULTS / 'comparacao_peso.json', 'w') as f:
     json.dump(best_info, f, indent=2)
 
+# Full per-model regression metrics (for the Excel export).
+# Regression has no confusion matrix / Accuracy / Precision / Recall / F1;
+# the equivalent metrics are R2, RMSE and MAE.
+full_metrics = {
+    'task': 'regression',
+    'target': 'PESO',
+    'features': FEATURES,
+    'n_test': int(len(y_test)),
+    'note': 'Regression models: no confusion matrix or Accuracy/Precision/Recall/F1. Metrics are R2, RMSE (g) and MAE (g).',
+    'models': [
+        {
+            'name': r['name'],
+            'r2_cv': r['r2_cv'],
+            'r2_test': r['r2_test'],
+            'rmse': r['rmse'],
+            'mae': r['mae'],
+        } for r in results
+    ],
+}
+with open(RESULTS / 'metricas_completas_peso.json', 'w') as f:
+    json.dump(full_metrics, f, indent=2, ensure_ascii=False)
+print("Saved: results/metricas_completas_peso.json")
+
 print(f"\n{'='*80}")
 print(f"BEST MODEL: {results[0]['name']} (R2={results[0]['r2_test']:.4f}, MAE={results[0]['mae']:.2f}g)")
 print(f"{'='*80}")
