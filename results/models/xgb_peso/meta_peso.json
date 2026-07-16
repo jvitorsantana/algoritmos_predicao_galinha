@@ -1,0 +1,29 @@
+{
+  "features": [
+    "IDADE",
+    "BICO",
+    "CIRCFCABECA",
+    "PESCOCO",
+    "ASA",
+    "TULIPA",
+    "DORSO",
+    "VENTRE",
+    "CIRCFABDOM",
+    "SOBRECOXA",
+    "COXA",
+    "CANELA",
+    "UNHAMAIOR"
+  ],
+  "params": {
+    "colsample_bytree": 0.6092215914416536,
+    "gamma": 0.060123613255837816,
+    "learning_rate": 0.015251140329839059,
+    "max_depth": 3,
+    "min_child_weight": 14,
+    "n_estimators": 364,
+    "reg_alpha": 0.01240403627731479,
+    "reg_lambda": 1.4375359309290117,
+    "subsample": 0.7205061043040002
+  },
+  "cv_score": 0.9438734150844714
+}

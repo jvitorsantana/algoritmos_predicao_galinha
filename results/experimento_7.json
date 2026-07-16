@@ -9,7 +9,7 @@
     "n_macho": 1335,
     "n_femea": 943,
     "baseline_acc": 0.586,
-    "xgb_auc": 0.5936,
+    "xgb_auc": 0.5949,
     "xgb_acc": 0.5873,
     "logreg_auc": 0.5492
   },
@@ -19,11 +19,11 @@
     "n_macho": 1335,
     "n_femea": 936,
     "baseline_acc": 0.5878,
-    "xgb_auc": 0.5847,
-    "xgb_acc": 0.5918,
-    "logreg_auc": 0.5663
+    "xgb_auc": 0.5837,
+    "xgb_acc": 0.583,
+    "logreg_auc": 0.5666
   },
-  "delta_auc_xgb": -0.0089,
-  "delta_auc_logreg": 0.0171,
+  "delta_auc_xgb": -0.0112,
+  "delta_auc_logreg": 0.0174,
   "veredito": "Limpeza NÃO melhorou -> sinal ausente nas medidas (rótulo não era o gargalo)."
 }

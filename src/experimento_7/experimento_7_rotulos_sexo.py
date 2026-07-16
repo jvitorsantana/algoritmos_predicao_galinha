@@ -11,7 +11,7 @@ Compara duas versões dos MESMOS dados, com validação cruzada por animal
               registros), pares (ANIMAL, IDADE) duplicados e erros de vírgula.
   B) LIMPO  - mesmas medidas, mas com: (i) 12 erros de vírgula corrigidos
               (valor ÷ 10), (ii) sexo por MAIORIA (uma ave = um sexo) e
-              (iii) deduplicação dos pares (ANIMAL, IDADE) pela média das medidas.
+              (iii) deduplicação dos pares (ANIMAL, IDADE) mantendo o 1º registro.
 
 Fonte: data/raw/dataset_original.csv (bruto pristino). Todas as correções são
 aplicadas EM CÓDIGO aqui, então o experimento é auto-contido e reproduzível.
@@ -129,8 +129,7 @@ for animal, idade, col, val in CORRECOES_VIRGULA:          # (i) vírgula
 B = limpeza_base(B)
 maioria = B.groupby('ANIMAL')['SEXO'].agg(lambda s: s.value_counts().index[0])
 B['SEXO'] = B['ANIMAL'].map(maioria)                        # (ii) sexo por maioria
-B = B.groupby(['ANIMAL', 'IDADE'], as_index=False).agg(     # (iii) dedup por média
-    {**{f: 'mean' for f in ['PESO'] + MORF}, 'SEXO': 'first'})
+B = B.drop_duplicates(subset=['ANIMAL', 'IDADE'], keep='first')  # (iii) dedup: mantém 1º registro
 res_B = avaliar(B, "B) LIMPO (vírgula + sexo por maioria + deduplicado)")
 
 # =============================================================================
