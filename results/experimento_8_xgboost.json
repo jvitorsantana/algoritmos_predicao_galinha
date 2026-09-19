@@ -1,0 +1,304 @@
+{
+  "experimento": "experimento_8_xgboost",
+  "modelo": "XGBoost (200 árvores, profundidade 3, lr 0.05)",
+  "unidade_amostral": "ave (uma linha por animal)",
+  "balanceamento": "subamostragem dos machos: mesmo nº de machos e fêmeas",
+  "divisao": "70/30 estratificada, repetida 30 vezes",
+  "features": "por medida: valor(t), delta desde o dia 1, inclinação na janela",
+  "coorte": {
+    "n_aves_coorte": 173,
+    "n_macho": 107,
+    "n_femea": 66,
+    "n_apos_balanceamento": 132,
+    "n_treino": 92,
+    "n_teste": 40
+  },
+  "janelas": [
+    {
+      "auc_media": 0.5035,
+      "auc_dp": 0.0802,
+      "auc_min": 0.3225,
+      "auc_max": 0.635,
+      "acuracia_media": 0.5033,
+      "acuracia_dp": 0.0622,
+      "sensibilidade_macho": 0.48,
+      "especificidade_femea": 0.5267,
+      "n_repeticoes": 30,
+      "idade_max": 0,
+      "idades": [
+        0
+      ],
+      "n_features": 13,
+      "p_permutacao": 0.4229,
+      "q_bh": 0.5437,
+      "significativo": false
+    },
+    {
+      "auc_media": 0.5454,
+      "auc_dp": 0.0769,
+      "auc_min": 0.3875,
+      "auc_max": 0.685,
+      "acuracia_media": 0.545,
+      "acuracia_dp": 0.0754,
+      "sensibilidade_macho": 0.5567,
+      "especificidade_femea": 0.5333,
+      "n_repeticoes": 30,
+      "idade_max": 7,
+      "idades": [
+        0,
+        7
+      ],
+      "n_features": 39,
+      "p_permutacao": 0.1592,
+      "q_bh": 0.2866,
+      "significativo": false
+    },
+    {
+      "auc_media": 0.4829,
+      "auc_dp": 0.0898,
+      "auc_min": 0.35,
+      "auc_max": 0.695,
+      "acuracia_media": 0.4942,
+      "acuracia_dp": 0.0782,
+      "sensibilidade_macho": 0.4983,
+      "especificidade_femea": 0.49,
+      "n_repeticoes": 30,
+      "idade_max": 14,
+      "idades": [
+        0,
+        7,
+        14
+      ],
+      "n_features": 39,
+      "p_permutacao": 0.6418,
+      "q_bh": 0.6418,
+      "significativo": false
+    },
+    {
+      "auc_media": 0.5266,
+      "auc_dp": 0.0842,
+      "auc_min": 0.375,
+      "auc_max": 0.71,
+      "acuracia_media": 0.5108,
+      "acuracia_dp": 0.0766,
+      "sensibilidade_macho": 0.5083,
+      "especificidade_femea": 0.5133,
+      "n_repeticoes": 30,
+      "idade_max": 21,
+      "idades": [
+        0,
+        7,
+        14,
+        21
+      ],
+      "n_features": 39,
+      "p_permutacao": 0.3532,
+      "q_bh": 0.5298,
+      "significativo": false
+    },
+    {
+      "auc_media": 0.5907,
+      "auc_dp": 0.0816,
+      "auc_min": 0.42,
+      "auc_max": 0.73,
+      "acuracia_media": 0.5558,
+      "acuracia_dp": 0.0752,
+      "sensibilidade_macho": 0.565,
+      "especificidade_femea": 0.5467,
+      "n_repeticoes": 30,
+      "idade_max": 28,
+      "idades": [
+        0,
+        7,
+        14,
+        21,
+        28
+      ],
+      "n_features": 39,
+      "p_permutacao": 0.0348,
+      "q_bh": 0.0783,
+      "significativo": false
+    },
+    {
+      "auc_media": 0.5037,
+      "auc_dp": 0.0822,
+      "auc_min": 0.3325,
+      "auc_max": 0.6475,
+      "acuracia_media": 0.5067,
+      "acuracia_dp": 0.0655,
+      "sensibilidade_macho": 0.505,
+      "especificidade_femea": 0.5083,
+      "n_repeticoes": 30,
+      "idade_max": 38,
+      "idades": [
+        0,
+        7,
+        14,
+        21,
+        28,
+        38
+      ],
+      "n_features": 39,
+      "p_permutacao": 0.4925,
+      "q_bh": 0.5541,
+      "significativo": false
+    },
+    {
+      "auc_media": 0.6147,
+      "auc_dp": 0.0823,
+      "auc_min": 0.4425,
+      "auc_max": 0.79,
+      "acuracia_media": 0.5817,
+      "acuracia_dp": 0.0689,
+      "sensibilidade_macho": 0.5633,
+      "especificidade_femea": 0.6,
+      "n_repeticoes": 30,
+      "idade_max": 52,
+      "idades": [
+        0,
+        7,
+        14,
+        21,
+        28,
+        38,
+        52
+      ],
+      "n_features": 39,
+      "p_permutacao": 0.01,
+      "q_bh": 0.03,
+      "significativo": true
+    },
+    {
+      "auc_media": 0.64,
+      "auc_dp": 0.0761,
+      "auc_min": 0.47,
+      "auc_max": 0.7825,
+      "acuracia_media": 0.5992,
+      "acuracia_dp": 0.0773,
+      "sensibilidade_macho": 0.5917,
+      "especificidade_femea": 0.6067,
+      "n_repeticoes": 30,
+      "idade_max": 66,
+      "idades": [
+        0,
+        7,
+        14,
+        21,
+        28,
+        38,
+        52,
+        66
+      ],
+      "n_features": 39,
+      "p_permutacao": 0.005,
+      "q_bh": 0.03,
+      "significativo": true
+    },
+    {
+      "auc_media": 0.6191,
+      "auc_dp": 0.0581,
+      "auc_min": 0.4825,
+      "auc_max": 0.76,
+      "acuracia_media": 0.585,
+      "acuracia_dp": 0.0614,
+      "sensibilidade_macho": 0.55,
+      "especificidade_femea": 0.62,
+      "n_repeticoes": 30,
+      "idade_max": 80,
+      "idades": [
+        0,
+        7,
+        14,
+        21,
+        28,
+        38,
+        52,
+        66,
+        80
+      ],
+      "n_features": 39,
+      "p_permutacao": 0.01,
+      "q_bh": 0.03,
+      "significativo": true
+    }
+  ],
+  "melhor_janela": 66,
+  "importancias_melhor_janela": [
+    {
+      "feature": "UNHAMAIOR_inclinacao",
+      "importancia_media": 0.06223298981785774,
+      "desvio": 0.012858905829489231
+    },
+    {
+      "feature": "UNHAMAIOR_valor",
+      "importancia_media": 0.03904050216078758,
+      "desvio": 0.014751623384654522
+    },
+    {
+      "feature": "UNHAMAIOR_delta",
+      "importancia_media": 0.03109944984316826,
+      "desvio": 0.011906209401786327
+    },
+    {
+      "feature": "COXA_valor",
+      "importancia_media": 0.03049018420279026,
+      "desvio": 0.010653800331056118
+    },
+    {
+      "feature": "CIRCFCABECA_valor",
+      "importancia_media": 0.02921123616397381,
+      "desvio": 0.008064995519816875
+    },
+    {
+      "feature": "ASA_inclinacao",
+      "importancia_media": 0.02906625159084797,
+      "desvio": 0.007506510242819786
+    },
+    {
+      "feature": "ASA_delta",
+      "importancia_media": 0.02849084511399269,
+      "desvio": 0.006920184474438429
+    },
+    {
+      "feature": "COXA_delta",
+      "importancia_media": 0.027836225926876068,
+      "desvio": 0.0073556737042963505
+    },
+    {
+      "feature": "CIRCFCABECA_inclinacao",
+      "importancia_media": 0.027683498337864876,
+      "desvio": 0.00644310237839818
+    },
+    {
+      "feature": "CIRCFCABECA_delta",
+      "importancia_media": 0.026954593136906624,
+      "desvio": 0.007274914067238569
+    },
+    {
+      "feature": "CANELA_inclinacao",
+      "importancia_media": 0.025203267112374306,
+      "desvio": 0.005985138472169638
+    },
+    {
+      "feature": "TULIPA_valor",
+      "importancia_media": 0.025140440091490746,
+      "desvio": 0.009148967452347279
+    },
+    {
+      "feature": "PESCOCO_delta",
+      "importancia_media": 0.025026382878422737,
+      "desvio": 0.0067349569872021675
+    },
+    {
+      "feature": "ASA_valor",
+      "importancia_media": 0.024945328012108803,
+      "desvio": 0.009161034598946571
+    },
+    {
+      "feature": "BICO_valor",
+      "importancia_media": 0.024893857538700104,
+      "desvio": 0.00851946510374546
+    }
+  ],
+  "veredito": "Janelas acima do acaso após correção: [52, 66, 80] dias. A predição de sexo passa a funcionar a partir de 52 dias."
+}

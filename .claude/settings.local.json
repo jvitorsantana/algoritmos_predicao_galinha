@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import json,sys; nb=json.load\\(sys.stdin\\); cell=nb[''''cells''''][6]; [print\\(o.get\\(''''text'''',''''''''\\)\\) for o in cell[''''outputs''''] if o.get\\(''''output_type''''\\) in \\(''''stream'''',''''execute_result''''\\)]\")",
+      "Bash(uv add:*)",
+      "Bash(uv run:*)",
+      "Bash(mkdir -p src/experimento_1 src/experimento_2 src/experimento_3 src/experimento_4)",
+      "Bash(git mv *)",
+      "Bash(python -c ' *)"
+    ]
+  }
+}

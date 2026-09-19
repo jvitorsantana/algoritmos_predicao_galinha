@@ -1,19 +1,3 @@
-"""
-CRISP-DM Phase 4: Modeling - Weight Prediction
-Experiment 5: XGBoost weight regression on the FULL dataset (no per-age split),
-using ONLY the most impactful features.
-
-Approach:
-  1. Train an XGBoost regressor on ALL candidate features (the 12 morphometric
-     measurements; IDADE is excluded by default - see INCLUDE_IDADE) and rank
-     features by gain-based importance.
-  2. Select the most impactful features: the smallest set whose cumulative
-     importance reaches CUMULATIVE_THRESHOLD (default 0.95).
-  3. Retrain XGBoost (with hyperparameter search) using ONLY the selected features.
-  4. Compare full-feature vs selected-feature models to confirm parity.
-
-All figures are saved with the `experimento_5_` prefix.
-"""
 import warnings
 warnings.filterwarnings('ignore')
 

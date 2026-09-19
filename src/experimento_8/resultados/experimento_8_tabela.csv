@@ -1,0 +1,10 @@
+janela;idade_max_dias;acuracia_logreg;desvio_logreg;auc_logreg;acuracia_xgboost;desvio_xgboost;auc_xgboost;significativo_logreg;significativo_xgboost
+1º dia;0;0.5058;0.0651;0.5108;0.5033;0.0622;0.5035;False;False
++7d;7;0.5092;0.0685;0.5399;0.545;0.0754;0.5454;False;False
++14d;14;0.46;0.0631;0.4361;0.4942;0.0782;0.4829;False;False
++21d;21;0.5167;0.069;0.5414;0.5108;0.0766;0.5266;False;False
++28d;28;0.5683;0.0686;0.5893;0.5558;0.0752;0.5907;False;False
++38d;38;0.5567;0.0658;0.5656;0.5067;0.0655;0.5037;False;False
++52d;52;0.5242;0.0709;0.5267;0.5817;0.0689;0.6147;False;True
++66d;66;0.6558;0.0694;0.7013;0.5992;0.0773;0.64;True;True
++80d;80;0.6233;0.0713;0.6891;0.585;0.0614;0.6191;True;True
